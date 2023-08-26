@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import SingleCard from "./components/SingleCard";
 import "./App.css";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const CardImages = [
   { src: "/img/helmet-1.png", matched: false },
   { src: "/img/potion-1.png", matched: false },
@@ -44,6 +47,20 @@ function App() {
     shuffleCards();
   }, []);
 
+  // Check if all cards are matched
+  useEffect(() => {
+    const allMatched = cards.every((card) => card.matched);
+    if (allMatched) {
+      setTimeout(
+        () =>
+          toast.success(
+            "Congratulations! You've completed the game! 🎉 Press on the new game to start again!"
+          ),
+        1000
+      );
+    }
+  }, [cards]);
+
   //* shuffle cards
   const shuffleCards = () => {
     const shuffledCards = [...CardImages, ...CardImages]
@@ -71,6 +88,7 @@ function App() {
 
   return (
     <div className="App">
+      <ToastContainer />
       <h1>Memory Game</h1>
       <p className="">Turns : {turns}</p>
       <button onClick={shuffleCards}>New Game</button>
