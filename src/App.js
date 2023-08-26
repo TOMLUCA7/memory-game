@@ -16,10 +16,12 @@ function App() {
   const [turns, setTurns] = useState(0);
   const [choiceOne, setChoiceOne] = useState(null);
   const [choiceTwo, setChoiceTwo] = useState(null);
+  const [disabled, setDisabled] = useState(false);
 
-  // compare 2 selected cards
+  //* compare 2 selected cards
   useEffect(() => {
     if (choiceOne && choiceTwo) {
+      setDisabled(true);
       if (choiceOne.src === choiceTwo.src) {
         setCards((prevCards) => {
           return prevCards.map((card) => {
@@ -32,39 +34,45 @@ function App() {
         });
         resetTurn();
       } else {
-        console.log("not good");
-        resetTurn();
+        setTimeout(() => resetTurn(), 1000);
       }
     }
   }, [choiceOne, choiceTwo]);
 
-  console.log(cards);
+  //* start a new game Automatically
+  useEffect(() => {
+    shuffleCards();
+  }, []);
 
-  // shuffle cards
+  //* shuffle cards
   const shuffleCards = () => {
     const shuffledCards = [...CardImages, ...CardImages]
       .sort(() => Math.random() - 0.5)
       .map((card) => ({ ...card, id: Math.random() }));
 
+    setChoiceOne(null);
+    setChoiceTwo(null);
     setCards(shuffledCards);
     setTurns(0);
   };
 
-  // handle a choice
+  //* handle a choice
   const handleChoice = (card) => {
     choiceOne ? setChoiceTwo(card) : setChoiceOne(card);
   };
 
-  // reset choices and turns
+  //* reset choices and turns
   const resetTurn = () => {
     setChoiceOne(null);
     setChoiceTwo(null);
-    setTurns(0);
+    setTurns((prev) => prev + 1);
+    setDisabled(false);
   };
 
   return (
     <div className="App">
       <h1>Memory Game</h1>
+      <p className="">Turns : {turns}</p>
       <button onClick={shuffleCards}>New Game</button>
 
       {/* cards grid */}
@@ -74,6 +82,8 @@ function App() {
             key={card.id}
             CardsGrid={card}
             handleChoice={handleChoice}
+            flipped={card === choiceOne || card === choiceTwo || card.matched}
+            disabled={disabled}
           />
         ))}
       </div>
